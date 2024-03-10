@@ -39,7 +39,7 @@ async def detect_emotion(frame):
         (x, y, w, h) = faces[0]
 
         face_roi = gray[y:y + h, x:x + w]
-        face_roi = cv2.resize(face_roi, (48, 48), interpolation=cv2.INTER_AREA)
+        face_roi = cv2.resize(face_roi, (64, 64), interpolation=cv2.INTER_AREA)
         face_roi = np.expand_dims(np.expand_dims(face_roi, -1), 0) / 255.0
 
         # Emotion detection
