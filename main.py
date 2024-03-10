@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 import cv2
 import numpy as np
 from keras.models import load_model
-import tensorflow
 
 
 app = FastAPI()
@@ -31,7 +30,7 @@ async def detect_emotion(frame):
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         # Detect faces in the image
-        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=10, minSize=(30, 30))
 
         if len(faces) == 0:
             return None
@@ -39,7 +38,7 @@ async def detect_emotion(frame):
         (x, y, w, h) = faces[0]
 
         face_roi = gray[y:y + h, x:x + w]
-        face_roi = cv2.resize(face_roi, (64,64), interpolation=cv2.INTER_AREA)
+        face_roi = cv2.resize(face_roi, (64, 64), interpolation=cv2.INTER_AREA)
         face_roi = np.expand_dims(np.expand_dims(face_roi, -1), 0) / 255.0
 
         # Emotion detection
@@ -71,6 +70,7 @@ async def detect_emotion_route(image: UploadFile = Form(...)):
         else:
             print('No face detected or failed to detect emotion')
             raise HTTPException(status_code=400, detail='No face detected or failed to detect emotion')
+      
 
     except HTTPException as http_exception:
         raise http_exception
@@ -78,10 +78,7 @@ async def detect_emotion_route(image: UploadFile = Form(...)):
         print('Error in /detect_emotion endpoint:', str(e))
         raise HTTPException(status_code=500, detail='Internal Server Error')
 
-
 if __name__ == '__main__':
     import uvicorn
 
-    uvicorn.run(app,host="0.0.0.0", port=8000)
-   
-    
+    uvicorn.run(app,host="0.0.0.0", port=5000)
